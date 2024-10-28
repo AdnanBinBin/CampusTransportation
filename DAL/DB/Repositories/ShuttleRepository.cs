@@ -41,7 +41,7 @@ namespace DAL.Repositories
             return _context.Shuttles.ToList();
         }
 
-        public Shuttle GetById(int id)
+        public Shuttle GetById(string id)
         {
             return _context.Shuttles.Find(id);
         }

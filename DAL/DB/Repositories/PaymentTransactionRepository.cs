@@ -1,11 +1,12 @@
 ﻿using DAL.DB;
 using DAL.DB.Model;
+using DAL.DB.Repositories;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace DAL.Repositories
 {
-    public class PaymentTransactionRepository : IRepository<PaymentTransaction>
+    public class PaymentTransactionRepository : IRepositoryInt<PaymentTransaction>
     {
         private readonly Context _context;
 
@@ -29,6 +30,16 @@ namespace DAL.Repositories
                 SaveData();
             }
         }
+
+        public PaymentTransaction GetLatestPaymentTransactionByUserId(int userId)
+        {
+            return _context.PaymentTransactions
+                           .Where(pt => pt.UserId == userId)
+                           .OrderByDescending(pt => pt.Date)
+                           .FirstOrDefault();
+        }
+
+
 
         public void Delete(PaymentTransaction paymentTransaction)
         {

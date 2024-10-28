@@ -1,11 +1,12 @@
 ﻿using DAL.DB;
 using DAL.DB.Model;
+using DAL.DB.Repositories;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace DAL.Repositories
 {
-    public class CardRepository : IRepository<Card>
+    public class CardRepository : IRepositoryInt<Card>
     {
         private readonly Context _context;
 

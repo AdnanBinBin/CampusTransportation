@@ -9,7 +9,7 @@ namespace ConsoleApp
         public static void Main(string[] args)
         {
             var options = new DbContextOptionsBuilder<Context>()
-                .UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=DbCampus")
+                .UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=DbCampusV7")
                 .Options;
 
             using (var context = new Context(options))

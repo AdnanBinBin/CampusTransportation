@@ -41,7 +41,7 @@ namespace DAL.Repositories
             return _context.Bikes.ToList();
         }
 
-        public Bike GetById(int id)
+        public Bike GetById(string id)
         {
             return _context.Bikes.Find(id);
         }

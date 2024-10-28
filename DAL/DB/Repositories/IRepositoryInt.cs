@@ -4,15 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DAL.Repositories
+namespace DAL.DB.Repositories
 {
-    public interface IRepository<T>
+    internal interface IRepositoryInt<T>
     {
         public void Insert(T entity);
         public void Update(T entity);
         public void Delete(T entity);
-        IEnumerable<T> GetAll(); 
+        IEnumerable<T> GetAll();
         public void SaveData();
-        public T GetById(string id);
+        public T GetById(int id);
     }
 }

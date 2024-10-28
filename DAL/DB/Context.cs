@@ -5,109 +5,235 @@ namespace DAL.DB
 {
     public class Context : DbContext
     {
-        // Définition des DbSet pour les tables
+        // DbSets
         public DbSet<TransportationTransaction> TransportationTransactions { get; set; }
         public DbSet<PaymentTransaction> PaymentTransactions { get; set; }
-        public DbSet<Bike> Bikes { get; set; } // Ajout du DbSet pour les vélos
-        public DbSet<SharedVehicule> SharedVehicules { get; set; } // Ajout du DbSet pour les véhicules partagés
-        public DbSet<Shuttle> Shuttles { get; set; } // Ajout du DbSet pour les navettes
-        public DbSet<User> Users { get; set; } // Ajout du DbSet pour les utilisateurs
-        public DbSet<Card> Cards { get; set; } // Ajout du DbSet pour les cartes
+        public DbSet<Bike> Bikes { get; set; }
+        public DbSet<SharedVehicule> SharedVehicules { get; set; }
+        public DbSet<Shuttle> Shuttles { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<Card> Cards { get; set; }
 
-        // Exemple de données statiques (si nécessaire)
-        private static TransportationTransaction[] _transportationTransactions = new[]
-        {
-            new TransportationTransaction { Id = 1, UserId = 1, ShuttleId = "Shuttle1", BikeId = "Bike1", Date = DateTime.Now, RentalStartTime = DateTime.Now.AddHours(-1), RentalEndTime = DateTime.Now }
-        };
-
-        private static PaymentTransaction[] _paymentTransactions = new[]
-        {
-            new PaymentTransaction { Id = 1, UserId = 1, Amount = 100.00m, Date = DateTime.Now, Method = PaymentMethod.CreditCard, IsRefund = false }
-        };
-
-        private static User[] _users = new[]
-        {
-            new User { Id = 1, Name = "John Doe", IsDisabled = false, IsStateFunded = true } // Update to include IsStateFunded
-        };
-
+        // Données de test pour les cartes
         private static Card[] _cards = new[]
         {
-            new Card { Id = 1, PaymentMethod = PaymentMethod.BankTransfer, UserId = 1 }
+            new Card {
+                Id = 1,
+                PaymentMethod = PaymentMethod.CreditCard
+            },
+            new Card {
+                Id = 2,
+                PaymentMethod = PaymentMethod.BankTransfer
+            },
+            new Card {
+                Id = 3,
+                PaymentMethod = PaymentMethod.CreditCard
+            },
+            new Card {
+                Id = 4,
+                PaymentMethod = PaymentMethod.BankTransfer
+            }
         };
 
-        // Constructeur
+        // Données de test pour les utilisateurs
+        private static User[] _users = new[]
+        {
+            new User {
+                Id = 1,
+                Name = "Jean Martin",
+                IsDisabled = false,
+                IsStateFunded = true,
+                CardId = 1
+            },
+            new User {
+                Id = 2,
+                Name = "Marie Dubois",
+                IsDisabled = false,
+                IsStateFunded = false,
+                CardId = 2
+            },
+            new User {
+                Id = 3,
+                Name = "Paul Bernard",
+                IsDisabled = true,
+                IsStateFunded = true,
+                CardId = 3
+            },
+            new User {
+                Id = 4,
+                Name = "Sophie Lambert",
+                IsDisabled = false,
+                IsStateFunded = true,
+                CardId = 4
+            }
+        };
+
+        // Données de test pour les vélos
+        private static Bike[] _bikes = new[]
+        {
+            new Bike {
+                Id = "BIKE001",
+                Name = "Vélo Classique 1",
+                IsAvailable = true,
+                Price = 2.50m
+            },
+            new Bike {
+                Id = "BIKE002",
+                Name = "Vélo Électrique 1",
+                IsAvailable = true,
+                Price = 4.00m
+            }
+        };
+
+        // Données de test pour les véhicules partagés
+        private static SharedVehicule[] _sharedVehicules = new[]
+        {
+            new SharedVehicule {
+                Id = "SHARE001",
+                Name = "Covoiturage Campus 1",
+                IsAvailable = true,
+                Price = 3.00m,
+                Capacity = 4,
+                DriverId = 1
+            },
+            new SharedVehicule {
+                Id = "SHARE002",
+                Name = "Covoiturage Campus 2",
+                IsAvailable = true,
+                Price = 3.00m,
+                Capacity = 6,
+                DriverId = 2
+            }
+        };
+
+        // Données de test pour les navettes
+        private static Shuttle[] _shuttles = new[]
+        {
+            new Shuttle {
+                Id = "SHUT001",
+                Name = "Navette Campus-Centre",
+                IsAvailable = true,
+                Price = 1.50m
+            },
+            new Shuttle {
+                Id = "SHUT002",
+                Name = "Navette Campus-Gare",
+                IsAvailable = true,
+                Price = 2.00m
+            }
+        };
+
         public Context(DbContextOptions options) : base(options)
         {
         }
 
-        // Configuration des options (comme la chaîne de connexion) si nécessaire
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=DbCampus");
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=DbCampusV7");
+            }
         }
 
-        // Configuration des modèles
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // Données initiales pour TransportationTransaction (optionnel)
-            modelBuilder.Entity<TransportationTransaction>().HasData(_transportationTransactions);
+            // Configuration des clés étrangères et relations
+            modelBuilder.Entity<User>()
+                .Property(u => u.CardId)
+                .IsRequired();
 
-            // Données initiales pour PaymentTransaction (optionnel)
-            modelBuilder.Entity<PaymentTransaction>().HasData(_paymentTransactions);
+            modelBuilder.Entity<User>()
+                .HasIndex(u => u.CardId)
+                .IsUnique();
 
-            // Données initiales pour User (optionnel)
-            modelBuilder.Entity<User>().HasData(_users);
-
-            // Données initiales pour Card (optionnel)
-            modelBuilder.Entity<Card>().HasData(_cards);
-
-            // Configuration des propriétés spécifiques pour PaymentTransaction
-            modelBuilder.Entity<PaymentTransaction>()
-                .Property(p => p.Amount);
-
-            // Configuration des propriétés spécifiques pour TransportationTransaction (facultatif)
+            // Configuration des transactions
             modelBuilder.Entity<TransportationTransaction>()
                 .Property(t => t.ShuttleId)
-                .HasMaxLength(50);  // Limitation de longueur pour ShuttleId
+                .HasMaxLength(50)
+                .IsRequired(false);
 
             modelBuilder.Entity<TransportationTransaction>()
                 .Property(t => t.BikeId)
-                .HasMaxLength(50);  // Limitation de longueur pour BikeId
+                .HasMaxLength(50)
+                .IsRequired(false);
 
-            // Configuration des propriétés pour Bike
+            modelBuilder.Entity<TransportationTransaction>()
+                .Property(t => t.SharedVehiculeId)
+                .HasMaxLength(50)
+                .IsRequired(false);
+
+            modelBuilder.Entity<PaymentTransaction>()
+                .Property(p => p.Amount)
+                .IsRequired();
+
+            // Configuration des entités Bike
+            modelBuilder.Entity<Bike>()
+                .Property(b => b.Id)
+                .HasMaxLength(50);
+
             modelBuilder.Entity<Bike>()
                 .Property(b => b.Name)
-                .HasMaxLength(100); // Limite de longueur pour le nom du vélo
+                .HasMaxLength(100)
+                .IsRequired();
 
-            // Configuration des propriétés pour SharedVehicule
+            modelBuilder.Entity<Bike>()
+                .Property(b => b.Price)
+                .IsRequired();
+
+            // Configuration des entités SharedVehicule
+            modelBuilder.Entity<SharedVehicule>()
+                .Property(v => v.Id)
+                .HasMaxLength(50);
+
             modelBuilder.Entity<SharedVehicule>()
                 .Property(v => v.Name)
-                .HasMaxLength(100); // Limite de longueur pour le nom du véhicule partagé
+                .HasMaxLength(100)
+                .IsRequired();
 
-            // Configuration des propriétés pour Shuttle
+            modelBuilder.Entity<SharedVehicule>()
+                .Property(v => v.Price)
+                .IsRequired();
+
+            modelBuilder.Entity<SharedVehicule>()
+                .Property(v => v.Capacity)
+                .IsRequired();
+
+            // Configuration des entités Shuttle
+            modelBuilder.Entity<Shuttle>()
+                .Property(s => s.Id)
+                .HasMaxLength(50);
+
             modelBuilder.Entity<Shuttle>()
                 .Property(s => s.Name)
-                .HasMaxLength(100); // Limite de longueur pour le nom de la navette
+                .HasMaxLength(100)
+                .IsRequired();
 
-            // Configuration des propriétés pour User
+            modelBuilder.Entity<Shuttle>()
+                .Property(s => s.Price)
+                .IsRequired();
+
+            // Configuration des entités User
             modelBuilder.Entity<User>()
                 .Property(u => u.Name)
-                .HasMaxLength(100); // Limite de longueur pour le nom de l'utilisateur
+                .HasMaxLength(100)
+                .IsRequired();
 
             modelBuilder.Entity<User>()
                 .Property(u => u.IsDisabled)
-                .IsRequired(); // IsDisabled est requis
+                .IsRequired();
 
             modelBuilder.Entity<User>()
                 .Property(u => u.IsStateFunded)
-                .IsRequired(); // IsStateFunded est requis
+                .IsRequired();
 
-            // Configuration des propriétés pour Card
-            modelBuilder.Entity<Card>()
-                .Property(c => c.UserId)
-                .IsRequired(); // UserId est requis
+            // Seeding des données
+            modelBuilder.Entity<Card>().HasData(_cards);
+            modelBuilder.Entity<User>().HasData(_users);
+            modelBuilder.Entity<Bike>().HasData(_bikes);
+            modelBuilder.Entity<SharedVehicule>().HasData(_sharedVehicules);
+            modelBuilder.Entity<Shuttle>().HasData(_shuttles);
         }
     }
 }
