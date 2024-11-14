@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DAL.DB.Repositories
 {
-    internal interface IRepositoryInt<T>
+    public interface IRepositoryInt<T>
     {
         public void Insert(T entity);
         public void Update(T entity);
