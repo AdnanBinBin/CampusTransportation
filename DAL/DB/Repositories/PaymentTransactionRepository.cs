@@ -1,12 +1,13 @@
 ﻿using DAL.DB;
 using DAL.DB.Model;
 using DAL.DB.Repositories;
+using DAL.DB.Repositories.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace DAL.Repositories
 {
-    public class PaymentTransactionRepository : IRepositoryInt<PaymentTransaction>
+    public class PaymentTransactionRepository : IExtendedPaymentTransactionRepository
     {
         private readonly Context _context;
 

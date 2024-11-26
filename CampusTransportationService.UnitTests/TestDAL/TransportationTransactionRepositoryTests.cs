@@ -268,5 +268,104 @@ namespace CampusTransportationService.UnitTests.TestDAL
             // Assert
             Assert.Equal(_data.Count, result.Count);
         }
+
+        [Fact]
+        public void GetLatestTransactionForShuttle_ShuttleWithTransactions_ReturnsMostRecent()
+        {
+            // Arrange
+            var now = DateTime.Now;
+            var data = _data.ToList(); // Clone existing data
+            data.Add(new TransportationTransaction
+            {
+                Id = 5,
+                ShuttleId = "SHUTTLE1",
+                Date = now.AddDays(-1),
+                UserId = 1
+            });
+            data.Add(new TransportationTransaction
+            {
+                Id = 6,
+                ShuttleId = "SHUTTLE1",
+                Date = now, // More recent
+                UserId = 2
+            });
+
+            var queryableData = data.AsQueryable();
+            _mockSet.As<IQueryable<TransportationTransaction>>()
+                   .Setup(m => m.Provider)
+                   .Returns(new TestAsyncQueryProvider<TransportationTransaction>(queryableData.Provider));
+            _mockSet.As<IQueryable<TransportationTransaction>>()
+                   .Setup(m => m.Expression)
+                   .Returns(queryableData.Expression);
+            _mockSet.As<IQueryable<TransportationTransaction>>()
+                   .Setup(m => m.ElementType)
+                   .Returns(queryableData.ElementType);
+            _mockSet.As<IQueryable<TransportationTransaction>>()
+                   .Setup(m => m.GetEnumerator())
+                   .Returns(() => queryableData.GetEnumerator());
+
+            // Act
+            var result = _repository.GetLatestTransactionForShuttle("SHUTTLE1");
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(6, result.Id);
+            Assert.Equal("SHUTTLE1", result.ShuttleId);
+        }
+
+        [Fact]
+        public void GetLatestTransactionForShuttle_NoTransactions_ReturnsNull()
+        {
+            // Act
+            var result = _repository.GetLatestTransactionForShuttle("NONEXISTENT_SHUTTLE");
+
+            // Assert
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public void GetLatestTransactionForSharedVehicule_VehiculeWithTransactions_ReturnsMostRecent()
+        {
+            // The data is already setup in the constructor with VEHICLE1 transactions
+            // Act
+            var result = _repository.GetLatestTransactionForSharedVehicule("VEHICLE1");
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(3, result.Id); // ID 3 has the most recent date
+            Assert.Equal("VEHICLE1", result.SharedVehiculeId);
+        }
+
+        [Fact]
+        public void GetLatestTransactionForSharedVehicule_NoTransactions_ReturnsNull()
+        {
+            // Act
+            var result = _repository.GetLatestTransactionForSharedVehicule("NONEXISTENT_VEHICLE");
+
+            // Assert
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public void Delete_ExistingTransaction_RemovesFromDatabase()
+        {
+            // Arrange
+            var transaction = new TransportationTransaction
+            {
+                Id = 1,
+                UserId = 1,
+                BikeId = "BIKE1",
+                Date = DateTime.Now
+            };
+
+            // Act
+            _repository.Delete(transaction);
+
+            // Assert
+            _mockSet.Verify(m => m.Remove(It.Is<TransportationTransaction>(t =>
+                t.Id == transaction.Id &&
+                t.UserId == transaction.UserId &&
+                t.BikeId == transaction.BikeId)), Times.Once());
+        }
     }
 }

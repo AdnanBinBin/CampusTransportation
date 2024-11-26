@@ -228,4 +228,27 @@ public class BikeRepositoryTests
         Assert.Contains(result, b => b.Id == "BIKE1");
         Assert.Contains(result, b => b.Id == "BIKE2");
     }
+
+    [Fact]
+    public void Delete_ExistingBike_RemovesFromDatabase()
+    {
+        // Arrange
+        var bike = new Bike
+        {
+            Id = "BIKE1",
+            Name = "TestBike",
+            IsAvailable = true,
+            Price = 10
+        };
+
+        // Act
+        _repository.Delete(bike);
+
+        // Assert
+        _mockSet.Verify(m => m.Remove(It.Is<Bike>(b =>
+            b.Id == bike.Id &&
+            b.Name == bike.Name &&
+            b.IsAvailable == bike.IsAvailable &&
+            b.Price == bike.Price)), Times.Once());
+    }
 }

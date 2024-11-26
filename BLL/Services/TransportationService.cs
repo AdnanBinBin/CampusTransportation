@@ -1,4 +1,6 @@
 ﻿using DAL.DB.Model;
+using DAL.DB.Repositories.Interfaces;
+using DAL.DB.Repositories;
 using DAL.Repositories;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -9,23 +11,22 @@ namespace BLL.Services
 {
     public class TransportationService : ITransportationService
     {
-        private readonly ShuttleRepository _shuttleRepository;
-        private readonly BikeRepository _bikeRepository;
-        private readonly TransportationTransactionRepository _transportationTransactionRepository;
-        private readonly PaymentTransactionRepository _paymentRepository;
-        private readonly SharedVehiculeRepository _sharedVehiculeRepository;
-        private readonly UserRepository _userRepository;
-        private readonly CardRepository _cardRepository;
-
+        private readonly IExtendedShuttleRepository _shuttleRepository;
+        private readonly IExtendedBikeRepository _bikeRepository;
+        private readonly IExtendedTransportationTransactionRepository _transportationTransactionRepository;
+        private readonly IExtendedPaymentTransactionRepository _paymentRepository;
+        private readonly IExtendedSharedVehiculeRepository _sharedVehiculeRepository;
+        private readonly IRepositoryInt<User> _userRepository;
+        private readonly IRepositoryInt<Card> _cardRepository;
 
         public TransportationService(
-        ShuttleRepository shuttleRepository,
-        BikeRepository bikeRepository,
-        TransportationTransactionRepository transportationTransactionRepository,
-        PaymentTransactionRepository paymentRepository,
-        SharedVehiculeRepository sharedVehiculeRepository,
-        UserRepository userRepository,
-        CardRepository cardRepository)
+        IExtendedShuttleRepository shuttleRepository,
+        IExtendedBikeRepository bikeRepository,
+        IExtendedTransportationTransactionRepository transportationTransactionRepository,
+        IExtendedPaymentTransactionRepository paymentRepository,
+        IExtendedSharedVehiculeRepository sharedVehiculeRepository,
+        IRepositoryInt<User> userRepository,
+        IRepositoryInt<Card> cardRepository)
         {
             _shuttleRepository = shuttleRepository ?? throw new ArgumentNullException(nameof(shuttleRepository));
             _bikeRepository = bikeRepository ?? throw new ArgumentNullException(nameof(bikeRepository));
@@ -33,9 +34,12 @@ namespace BLL.Services
             _paymentRepository = paymentRepository ?? throw new ArgumentNullException(nameof(paymentRepository));
             _sharedVehiculeRepository = sharedVehiculeRepository ?? throw new ArgumentNullException(nameof(sharedVehiculeRepository));
             _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
-            _cardRepository = cardRepository;
+            _cardRepository = cardRepository ?? throw new ArgumentNullException(nameof(cardRepository));
         }
 
+
+
+        
         public bool BoardShuttle(int userId, string shuttleId)
         {
             try
@@ -142,7 +146,7 @@ namespace BLL.Services
             }
         }
 
-        private bool IsBikeRented(string bikeId)
+        internal bool IsBikeRented(string bikeId)
         {
             var lastTransaction = _transportationTransactionRepository.GetLatestTransactionForBike(bikeId);
 

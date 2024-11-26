@@ -2,10 +2,11 @@
 using DAL.DB.Model;
 using System.Collections.Generic;
 using System.Linq;
+using DAL.DB.Repositories.Interfaces;
 
 namespace DAL.Repositories
 {
-    public class BikeRepository : IRepository<Bike>
+    public class BikeRepository : IExtendedBikeRepository
     {
         private readonly Context _context;
 

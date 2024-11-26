@@ -4,10 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using DAL.DB.Repositories;
+using DAL.DB.Repositories.Interfaces;
 
 namespace DAL.Repositories
 {
-    public class TransportationTransactionRepository : IRepositoryInt<TransportationTransaction>
+    public class TransportationTransactionRepository : IExtendedTransportationTransactionRepository
     {
         private readonly Context _context;
 
