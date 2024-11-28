@@ -18,6 +18,7 @@ namespace ConsoleApp1.Controllers
             };
         }
 
+
         public async Task<SharedVehicleResponseDto> CreateTripAsync(int driverId, string sharedVehicleId)
         {
             try
@@ -25,19 +26,29 @@ namespace ConsoleApp1.Controllers
                 var response = await _httpClient.PostAsync(
                     $"/api/sharedvehicle/createTrip?driverId={driverId}&sharedVehicleId={sharedVehicleId}",
                     null);
-                response.EnsureSuccessStatusCode();
-                var result = await response.Content.ReadFromJsonAsync<SharedVehicleResponseDto>();
 
-                if (result == null)
+                if (response.IsSuccessStatusCode)
                 {
-                    throw new Exception("La réponse de l'API est vide");
+                    var result = await response.Content.ReadFromJsonAsync<SharedVehicleResponseDto>();
+                    if (result == null)
+                    {
+                        throw new Exception("La réponse de l'API est vide");
+                    }
+                    return result;
                 }
-
-                return result;
+                else
+                {
+                    var errorContent = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
+                    throw new Exception(errorContent?.Error ?? "Une erreur s'est produite lors de la création du trajet");
+                }
             }
             catch (HttpRequestException ex)
             {
-                throw new Exception($"Erreur lors de la création du trajet: {ex.Message}", ex);
+                throw new Exception($"Erreur de connexion lors de la création du trajet : {ex.Message}", ex);
+            }
+            catch (Exception ex) when (ex.Message != null)
+            {
+                throw; 
             }
         }
 
@@ -48,19 +59,29 @@ namespace ConsoleApp1.Controllers
                 var response = await _httpClient.PostAsync(
                     $"/api/sharedvehicle/rent?userId={userId}&sharedVehicleId={sharedVehicleId}&driverId={driverId}",
                     null);
-                response.EnsureSuccessStatusCode();
-                var result = await response.Content.ReadFromJsonAsync<SharedVehicleResponseDto>();
 
-                if (result == null)
+                if (response.IsSuccessStatusCode)
                 {
-                    throw new Exception("La réponse de l'API est vide");
+                    var result = await response.Content.ReadFromJsonAsync<SharedVehicleResponseDto>();
+                    if (result == null)
+                    {
+                        throw new Exception("La réponse de l'API est vide");
+                    }
+                    return result;
                 }
-
-                return result;
+                else
+                {
+                    var errorContent = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
+                    throw new Exception(errorContent?.Error ?? "Une erreur s'est produite lors de la location du véhicule partagé");
+                }
             }
             catch (HttpRequestException ex)
             {
-                throw new Exception($"Erreur lors de la location du véhicule partagé: {ex.Message}", ex);
+                throw new Exception($"Erreur de connexion lors de la location du véhicule partagé : {ex.Message}", ex);
+            }
+            catch (Exception ex) when (ex.Message != null)
+            {
+                throw;
             }
         }
 
@@ -71,19 +92,29 @@ namespace ConsoleApp1.Controllers
                 var response = await _httpClient.PostAsync(
                     $"/api/sharedvehicle/end?sharedVehicleId={sharedVehicleId}&driverId={driverId}",
                     null);
-                response.EnsureSuccessStatusCode();
-                var result = await response.Content.ReadFromJsonAsync<SharedVehicleResponseDto>();
 
-                if (result == null)
+                if (response.IsSuccessStatusCode)
                 {
-                    throw new Exception("La réponse de l'API est vide");
+                    var result = await response.Content.ReadFromJsonAsync<SharedVehicleResponseDto>();
+                    if (result == null)
+                    {
+                        throw new Exception("La réponse de l'API est vide");
+                    }
+                    return result;
                 }
-
-                return result;
+                else
+                {
+                    var errorContent = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
+                    throw new Exception(errorContent?.Error ?? "Une erreur s'est produite lors de la fin de location");
+                }
             }
             catch (HttpRequestException ex)
             {
-                throw new Exception($"Erreur lors de la fin de location: {ex.Message}", ex);
+                throw new Exception($"Erreur de connexion lors de la fin de location : {ex.Message}", ex);
+            }
+            catch (Exception ex) when (ex.Message != null)
+            {
+                throw;
             }
         }
     }

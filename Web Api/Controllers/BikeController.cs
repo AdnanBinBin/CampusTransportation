@@ -1,6 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using BLL.Services;
-using System;
+﻿using BLL.Services;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Web_Api.Controllers
 {
@@ -22,19 +21,19 @@ namespace Web_Api.Controllers
             {
                 DateTime rentalStartTime;
                 bool result = _transportationService.RentBike(userId, bikeId, out rentalStartTime);
-
                 if (result)
                 {
                     return Ok(new { Message = "Vélo loué avec succès.", RentalStartTime = rentalStartTime });
                 }
-                else
-                {
-                    return BadRequest("Échec de la location du vélo.");
-                }
+                return BadRequest(new { Message = "Échec de la location du vélo." });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { Message = ex.Message });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Erreur lors de la location du vélo : {ex.Message}");
+                return StatusCode(500, new { Message = "Une erreur interne s'est produite lors de la location.", Error = ex.Message });
             }
         }
 
@@ -45,19 +44,19 @@ namespace Web_Api.Controllers
             {
                 DateTime rentalEndTime = DateTime.Now;
                 bool result = _transportationService.EndBikeRental(userId, bikeId, rentalEndTime);
-
                 if (result)
                 {
                     return Ok(new { Message = "Location de vélo terminée avec succès.", RentalEndTime = rentalEndTime });
                 }
-                else
-                {
-                    return BadRequest("Échec de la fin de la location du vélo.");
-                }
+                return BadRequest(new { Message = "Échec de la fin de la location du vélo." });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { Message = ex.Message });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Erreur lors de la fin de la location du vélo : {ex.Message}");
+                return StatusCode(500, new { Message = "Une erreur interne s'est produite lors de la fin de location.", Error = ex.Message });
             }
         }
     }

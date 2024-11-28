@@ -1,40 +1,35 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using BLL.Services;
-using System;
+﻿using BLL.Services;
+using Microsoft.AspNetCore.Mvc;
 
-namespace Web_Api.Controllers
+[ApiController]
+[Route("api/[controller]")]
+public class ShuttleController : ControllerBase
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class ShuttleController : ControllerBase
+    private readonly ITransportationService _transportationService;
+    public ShuttleController(ITransportationService transportationService)
     {
-        private readonly ITransportationService _transportationService;
+        _transportationService = transportationService;
+    }
 
-        public ShuttleController(ITransportationService transportationService)
+    [HttpPost("board")]
+    public IActionResult BoardShuttle(int userId, string shuttleId)
+    {
+        try
         {
-            _transportationService = transportationService;
+            bool result = _transportationService.BoardShuttle(userId, shuttleId);
+            if (result)
+            {
+                return Ok(new { Message = "Embarquement dans la navette réussi." });
+            }
+            return BadRequest(new { Message = "Échec de l'embarquement dans la navette." });
         }
-
-        [HttpPost("board")]
-        public IActionResult BoardShuttle(int userId, string shuttleId)
+        catch (InvalidOperationException ex)
         {
-            try
-            {
-                bool result = _transportationService.BoardShuttle(userId, shuttleId);
-
-                if (result)
-                {
-                    return Ok(new { Message = "Embarquement dans la navette réussi." });
-                }
-                else
-                {
-                    return BadRequest("Échec de l'embarquement dans la navette.");
-                }
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Erreur lors de l'embarquement dans la navette : {ex.Message}");
-            }
+            return BadRequest(new { Message = "Échec de l'embarquement dans la navette", Error = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { Message = "Une erreur interne s'est produite lors de l'embarquement.", Error = ex.Message });
         }
     }
 }

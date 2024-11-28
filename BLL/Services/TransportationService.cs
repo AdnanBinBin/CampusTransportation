@@ -156,7 +156,26 @@ namespace BLL.Services
 
         public List<TransportationTransaction> GetUserTransportationTransactions(int userId)
         {
-            throw new NotImplementedException();
+            try
+            {
+                if (IsUserDisabled(userId))
+                {
+                    throw new InvalidOperationException("L'utilisateur est désactivé ou introuvable.");
+                }
+
+                // Récupère toutes les transactions pour cet utilisateur
+                var transactions = _transportationTransactionRepository
+                    .GetAll()
+                    .Where(t => t.UserId == userId)
+                    .OrderByDescending(t => t.Date)
+                    .ToList();
+
+                return transactions;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Erreur lors de la récupération des transactions de transport : {ex.Message}", ex);
+            }
         }
 
         public bool RentBike(int userId, string bikeId, out DateTime rentalStartTime)
@@ -313,6 +332,9 @@ namespace BLL.Services
             }
         }
 
+
+
+
         public bool RentSharedVehicle(int userId, string sharedVehicleId, out DateTime rentalStartTime, int driverId)
         {
             rentalStartTime = DateTime.Now;
@@ -422,5 +444,29 @@ namespace BLL.Services
                 throw new Exception($"Erreur lors de la fin du trajet en véhicule partagé : {ex.Message}", ex);
             }
         }
+
+        public List<PaymentTransaction> GetUserPaymentTransactions(int userId)
+        {
+            try
+            {
+                if (IsUserDisabled(userId))
+                {
+                    throw new InvalidOperationException("L'utilisateur est désactivé ou introuvable.");
+                }
+
+                // Récupérer toutes les transactions de paiement et filtrer par userId
+                return _paymentRepository
+                    .GetAll()
+                    .Where(t => t.UserId == userId)
+                    .OrderByDescending(t => t.Date)
+                    .ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Erreur lors de la récupération des transactions de paiement : {ex.Message}", ex);
+            }
+        }
     }
+
+
 }

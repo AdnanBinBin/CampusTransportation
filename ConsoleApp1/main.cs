@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using ConsoleApp1.Controllers;
 using ConsoleApp1.Commands;
 using ConsoleApp1.Commands.Bike;
+using ConsoleApp1.Commands.User;
 
 namespace ConsoleApp1
 {
@@ -13,6 +14,7 @@ namespace ConsoleApp1
         private static readonly BikeApiClient _bikeClient;
         private static readonly ShuttleApiClient _shuttleClient;
         private static readonly SharedVehicleApiClient _sharedVehicleClient;
+        private static readonly UserApiClient _userClient;
         private static int _currentUserId;
         private static List<ICommand> _commands;
 
@@ -21,6 +23,7 @@ namespace ConsoleApp1
             _bikeClient = new BikeApiClient(BaseApiUrl);
             _shuttleClient = new ShuttleApiClient(BaseApiUrl);
             _sharedVehicleClient = new SharedVehicleApiClient(BaseApiUrl);
+            _userClient = new UserApiClient(BaseApiUrl);
         }
 
         static async Task Main(string[] args)
@@ -45,7 +48,7 @@ namespace ConsoleApp1
                         return;
                     }
 
-                    if (choice == "7")
+                    if (choice == "8")
                     {
                         if (!await InitializeUserSession())
                         {
@@ -65,7 +68,7 @@ namespace ConsoleApp1
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"\nErreur : {ex.Message}");
+                    Console.WriteLine($"{ex.Message}");
                 }
 
                 Console.WriteLine("\nAppuyez sur une touche pour continuer...");
@@ -82,7 +85,8 @@ namespace ConsoleApp1
                 new BoardShuttleCommand(_shuttleClient, _currentUserId),
                 new CreateSharedVehicleTripCommand(_sharedVehicleClient, _currentUserId),
                 new JoinSharedVehicleCommand(_sharedVehicleClient, _currentUserId),
-                new EndSharedVehicleTripCommand(_sharedVehicleClient, _currentUserId)
+                new EndSharedVehicleTripCommand(_sharedVehicleClient, _currentUserId),
+                new TransactionCommand(_userClient, _currentUserId),
             };
         }
 
@@ -96,7 +100,7 @@ namespace ConsoleApp1
                 Console.WriteLine($"{i + 1}. {_commands[i].Name}");
             }
 
-            Console.WriteLine("7. Changer d'utilisateur");
+            Console.WriteLine("8. Changer d'utilisateur");
             Console.WriteLine("0. Quitter");
             Console.WriteLine("\nChoisissez une option :");
         }
