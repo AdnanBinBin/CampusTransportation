@@ -69,9 +69,7 @@ namespace CampusTransportationService.UnitTests.TestDAL
             _repository = new ShuttleRepository(_context);
         }
 
-        #region Helper Classes
-        // Mêmes classes helper que précédemment (TestAsyncQueryProvider, etc.)
-        #endregion
+     
 
         [Fact]
         public void GetById_ExistingShuttleId_ReturnsShuttle()

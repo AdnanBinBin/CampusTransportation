@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
+using System.Diagnostics.CodeAnalysis;
 
 namespace CampusTransportationService.UnitTests.TestDAL
 {
@@ -78,6 +79,7 @@ namespace CampusTransportationService.UnitTests.TestDAL
             _repository = new PaymentTransactionRepository(_context);
         }
 
+        [ExcludeFromCodeCoverage]
         #region Helper Classes
         internal class TestAsyncQueryProvider<TEntity> : IQueryProvider
         {
@@ -109,6 +111,7 @@ namespace CampusTransportationService.UnitTests.TestDAL
             }
         }
 
+        [ExcludeFromCodeCoverage]
         internal class TestAsyncEnumerable<T> : EnumerableQuery<T>, IAsyncEnumerable<T>, IQueryable<T>
         {
             public TestAsyncEnumerable(IEnumerable<T> enumerable)
@@ -127,6 +130,8 @@ namespace CampusTransportationService.UnitTests.TestDAL
             }
         }
 
+
+        [ExcludeFromCodeCoverage]
         internal class TestAsyncEnumerator<T> : IAsyncEnumerator<T>
         {
             private readonly IEnumerator<T> _inner;

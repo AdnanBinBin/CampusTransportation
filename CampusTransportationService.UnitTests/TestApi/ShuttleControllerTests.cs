@@ -126,13 +126,13 @@ namespace Web_Api.Tests.Controllers
             var result = _controller.BoardShuttle(userId, shuttleId);
 
             // Assert
-            var statusCodeResult = Assert.IsType<ObjectResult>(result);
-            Assert.Equal(500, statusCodeResult.StatusCode);
-            Assert.Contains("Operation not allowed", statusCodeResult.Value.ToString());
+            var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
+            Assert.Equal(400, badRequestResult.StatusCode);
+            Assert.Contains("Operation not allowed", badRequestResult.Value.ToString());
         }
 
         [Fact]
-        public void BoardShuttle_VerifyServiceIsCalled()
+        public void BoardShuttle_ServiceIsCalled_ServiceIsInvokedOnce()
         {
             // Arrange
             int userId = 1;

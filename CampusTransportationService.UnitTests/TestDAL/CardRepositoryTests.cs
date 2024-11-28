@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
+using System.Diagnostics.CodeAnalysis;
 
 public class CardRepositoryTests
 {
@@ -57,6 +58,7 @@ public class CardRepositoryTests
         _repository = new CardRepository(_context);
     }
 
+    [ExcludeFromCodeCoverage]
     // Classes helper pour les tests asynchrones
     internal class TestAsyncQueryProvider<TEntity> : IQueryProvider
     {
@@ -87,7 +89,7 @@ public class CardRepositoryTests
             return _inner.Execute<TResult>(expression);
         }
     }
-
+    [ExcludeFromCodeCoverage]
     internal class TestAsyncEnumerable<T> : EnumerableQuery<T>, IAsyncEnumerable<T>, IQueryable<T>
     {
         public TestAsyncEnumerable(IEnumerable<T> enumerable)
@@ -105,7 +107,7 @@ public class CardRepositoryTests
             return new TestAsyncEnumerator<T>(this.AsEnumerable().GetEnumerator());
         }
     }
-
+    [ExcludeFromCodeCoverage]
     internal class TestAsyncEnumerator<T> : IAsyncEnumerator<T>
     {
         private readonly IEnumerator<T> _inner;

@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using DAL.Repositories;
 using System.Linq.Expressions;
+using System.Diagnostics.CodeAnalysis;
 
 public class BikeRepositoryTests
 {
@@ -56,6 +57,8 @@ public class BikeRepositoryTests
         _repository = new BikeRepository(_context);
     }
 
+
+    [ExcludeFromCodeCoverage]
     // Classe helper pour supporter les requêtes asynchrones
     internal class TestAsyncQueryProvider<TEntity> : IQueryProvider
     {
@@ -87,6 +90,7 @@ public class BikeRepositoryTests
         }
     }
 
+    [ExcludeFromCodeCoverage]
     internal class TestAsyncEnumerable<T> : EnumerableQuery<T>, IAsyncEnumerable<T>, IQueryable<T>
     {
         public TestAsyncEnumerable(IEnumerable<T> enumerable)
@@ -105,6 +109,7 @@ public class BikeRepositoryTests
         }
     }
 
+    [ExcludeFromCodeCoverage]
     internal class TestAsyncEnumerator<T> : IAsyncEnumerator<T>
     {
         private readonly IEnumerator<T> _inner;

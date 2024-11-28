@@ -757,14 +757,112 @@ namespace BLL.Services.Tests
         }
 
         [Fact]
-        public void GetUserTransportationTransactions_ThrowsNotImplementedException()
+         public void GetUserTransportationTransactions_UserExistsAndHasTransactions_ReturnsAllUserTransactions()
         {
             // Arrange
             int userId = 1;
+            var user = new User { Id = userId, IsDisabled = false };
+            var transactions = new List<TransportationTransaction>
+    {
+        new TransportationTransaction { UserId = userId, Date = DateTime.Now },
+        new TransportationTransaction { UserId = userId, Date = DateTime.Now.AddDays(-1) }
+    };
+
+            _mockUserRepo.Setup(r => r.GetById(userId)).Returns(user);
+            _mockTransportRepo.Setup(r => r.GetAll()).Returns(transactions);
+
+            // Act
+            var result = _service.GetUserTransportationTransactions(userId);
+
+            // Assert
+            Assert.Equal(2, result.Count);
+            Assert.All(result, t => Assert.Equal(userId, t.UserId));
+        }
+
+        [Fact]
+        public void GetUserTransportationTransactions_DisabledUser_ThrowsException()
+        {
+            // Arrange
+            int userId = 1;
+            var user = new User { Id = userId, IsDisabled = true };
+            _mockUserRepo.Setup(r => r.GetById(userId)).Returns(user);
 
             // Act & Assert
-            Assert.Throws<NotImplementedException>(() =>
+            var exception = Assert.Throws<Exception>(() =>
                 _service.GetUserTransportationTransactions(userId));
+            Assert.Equal("Erreur lors de la récupération des transactions de transport : L'utilisateur est désactivé ou introuvable.",
+                exception.Message);
+        }
+
+        [Fact]
+        public void GetUserPaymentTransactions_UserExistsAndHasTransactions_ReturnsAllUserTransactions()
+
+        {
+            // Arrange
+            int userId = 1;
+            var user = new User { Id = userId, IsDisabled = false };
+            var transactions = new List<PaymentTransaction>
+    {
+        new PaymentTransaction { UserId = userId, Date = DateTime.Now },
+        new PaymentTransaction { UserId = userId, Date = DateTime.Now.AddDays(-1) }
+    };
+
+            _mockUserRepo.Setup(r => r.GetById(userId)).Returns(user);
+            _mockPaymentRepo.Setup(r => r.GetAll()).Returns(transactions);
+
+            // Act
+            var result = _service.GetUserPaymentTransactions(userId);
+
+            // Assert
+            Assert.Equal(2, result.Count);
+            Assert.All(result, t => Assert.Equal(userId, t.UserId));
+        }
+
+        [Fact]
+        public void GetUserPaymentTransactions_DisabledUser_ThrowsException()
+        {
+            // Arrange
+            int userId = 1;
+            var user = new User { Id = userId, IsDisabled = true };
+            _mockUserRepo.Setup(r => r.GetById(userId)).Returns(user);
+
+            // Act & Assert
+            var exception = Assert.Throws<Exception>(() =>
+                _service.GetUserPaymentTransactions(userId));
+            Assert.Equal("Erreur lors de la récupération des transactions de paiement : L'utilisateur est désactivé ou introuvable.",
+                exception.Message);
+        }
+
+        [Fact]
+        public void GetUserPaymentTransactions_UserNotFound_ThrowsException()
+        {
+            // Arrange
+            int userId = 1;
+            _mockUserRepo.Setup(r => r.GetById(userId)).Returns((User)null);
+
+            // Act & Assert
+            var exception = Assert.Throws<Exception>(() =>
+                _service.GetUserPaymentTransactions(userId));
+            Assert.Equal("Erreur lors de la récupération des transactions de paiement : Utilisateur introuvable.",
+                exception.Message);
+        }
+
+        [Fact]
+        public void GetUserPaymentTransactions_NoTransactions_ReturnsEmptyList()
+        {
+            // Arrange
+            int userId = 1;
+            var user = new User { Id = userId, IsDisabled = false };
+            var transactions = new List<PaymentTransaction>();
+
+            _mockUserRepo.Setup(r => r.GetById(userId)).Returns(user);
+            _mockPaymentRepo.Setup(r => r.GetAll()).Returns(transactions);
+
+            // Act
+            var result = _service.GetUserPaymentTransactions(userId);
+
+            // Assert
+            Assert.Empty(result);
         }
     }
 

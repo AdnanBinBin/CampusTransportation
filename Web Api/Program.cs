@@ -6,7 +6,12 @@ using DAL.DB.Repositories.Interfaces;
 using DAL.Repositories;
 using Microsoft.EntityFrameworkCore;
 
-var builder = WebApplication.CreateBuilder(args);
+[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+public partial class Program
+{
+    public static void Main(string[] args)
+    {
+        var builder = WebApplication.CreateBuilder(args);
 
 // Ajouter les services au conteneur.
 
@@ -59,3 +64,5 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+    }
+}
