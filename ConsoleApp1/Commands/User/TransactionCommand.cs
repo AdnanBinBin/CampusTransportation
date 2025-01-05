@@ -42,7 +42,7 @@ namespace ConsoleApp1.Commands.User
                         Date = t.Date,
                         TransportInfo = t,
                         PaymentInfo = paymentResponse.Transactions
-                            .FirstOrDefault(p => p.Date.Date == t.Date.Date && p.UserId == t.UserId)
+                            .Find(p => p.Date.Date == t.Date.Date && p.UserId == t.UserId)
                     })
                     .OrderByDescending(x => x.Date);
 
@@ -92,7 +92,7 @@ namespace ConsoleApp1.Commands.User
             }
         }
 
-        private string DetermineTransportType(TransportationTransactionDto transaction)
+        private static string DetermineTransportType(TransportationTransactionDto transaction)
         {
             if (!string.IsNullOrEmpty(transaction.BikeId))
                 return $"Vélo (ID: {transaction.BikeId})";
@@ -103,7 +103,7 @@ namespace ConsoleApp1.Commands.User
             return "Type inconnu";
         }
 
-        private string FormatDuration(TimeSpan duration)
+        private static string FormatDuration(TimeSpan duration)
         {
             if (duration.TotalHours >= 1)
                 return $"{Math.Floor(duration.TotalHours)}h {duration.Minutes}min";
