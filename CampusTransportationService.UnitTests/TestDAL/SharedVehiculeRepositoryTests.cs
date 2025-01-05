@@ -191,6 +191,10 @@ namespace CampusTransportationService.UnitTests.TestDAL
         public void Insert_ValidVehicle_AddedToDatabase()
         {
             // Arrange
+            var insertedVehicles = new List<SharedVehicule>();
+            _mockSet.Setup(m => m.Add(It.IsAny<SharedVehicule>()))
+                   .Callback<SharedVehicule>(v => insertedVehicles.Add(v));
+
             var vehicle = new SharedVehicule
             {
                 Id = "VEHICLE3",
@@ -205,11 +209,13 @@ namespace CampusTransportationService.UnitTests.TestDAL
             _repository.Insert(vehicle);
 
             // Assert
-            _mockSet.Verify(m => m.Add(It.Is<SharedVehicule>(v =>
-                v.Id == vehicle.Id &&
-                v.Name == vehicle.Name &&
-                v.Capacity == vehicle.Capacity)),
-                Times.Once());
+            Assert.Single(insertedVehicles);
+            var insertedVehicle = insertedVehicles[0];
+            Assert.Equal(vehicle.Id, insertedVehicle.Id);
+            Assert.Equal(vehicle.Name, insertedVehicle.Name);
+            Assert.Equal(vehicle.Capacity, insertedVehicle.Capacity);
+            Assert.Equal(vehicle.Price, insertedVehicle.Price);
+            Assert.Equal(vehicle.IsAvailable, insertedVehicle.IsAvailable);
         }
 
         [Fact]
